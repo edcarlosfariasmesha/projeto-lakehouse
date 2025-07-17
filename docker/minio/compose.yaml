@@ -1,0 +1,99 @@
+name: minio
+
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+  command: server --address ":10000" --console-address ":10001" http://minio{1...4}/data{1...2}
+  # deploy:
+  #   resources:
+  #     limits:
+  #       cpus: "2"
+  #       memory: "4G"
+  #     reservations:
+  #       cpus: "1"
+  #       memory: "3G"
+  expose:
+    - "10000"
+    - "10001"
+  environment:
+    MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+    MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+  healthcheck:
+    test: ["CMD", "mc", "ready", "local"]
+    interval: 5s
+    timeout: 5s
+    retries: 5
+  networks:
+    - projeto-lakehouse
+
+services:
+  minio1:
+    <<: *minio-common
+    container_name: minio1
+    hostname: minio1
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    container_name: minio2
+    hostname: minio2
+    volumes:
+      - data2-1:/data1
+      - data2-2:/data2
+
+  minio3:
+    <<: *minio-common
+    container_name: minio3
+    hostname: minio3
+    volumes:
+      - data3-1:/data1
+      - data3-2:/data2
+
+  minio4:
+    <<: *minio-common
+    container_name: minio4
+    hostname: minio4
+    volumes:
+      - data4-1:/data1
+      - data4-2:/data2
+
+  nginx:
+    image: nginx:1.19.2-alpine
+    container_name: nginx
+    hostname: nginx
+    volumes:
+      - ./nginx/etc/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4G"
+        reservations:
+          cpus: "1"
+          memory: "3G"
+    networks:
+      - projeto-lakehouse
+
+networks:
+  projeto-lakehouse:
+    name: projeto-lakehouse
+    external: true
+ 
+volumes:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+  data3-1:
+  data3-2:
+  data4-1:
+  data4-2:

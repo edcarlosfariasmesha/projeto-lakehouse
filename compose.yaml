@@ -1,0 +1,3 @@
+include:
+  - docker/minio/compose.yaml
+  - docker/airflow/compose.yaml
