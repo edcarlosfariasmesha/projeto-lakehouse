@@ -181,5 +181,26 @@ Persistência bem-sucedida dos dados, com estrutura Delta armazenada no MinIO
 
 Resultado: A escrita no formato Delta funcionou conforme esperado, validando a comunicação entre Spark e MinIO e confirmando que a infraestrutura está pronta para os próximos passos do pipeline. 
 
+## 14 - Ativação do Apache Airflow e Configuração da DAG
 
+Para resolver o erro de conexão da DAG `geography_coordinates` no Airflow, foram realizados os seguintes passos:
 
+- O Airflow foi aberto no navegador na porta **8080** (ex: http://localhost:8080). 
+
+- No menu superior, acessei **Admin > Variables**. 
+
+- Cliquei em **Add Variable** no canto superior direito. 
+
+- Criei uma variável com: 
+
+  - **Key:** `minio_connection.json` (nome do arquivo JSON localizado na pasta `variables` do projeto) 
+
+  - **Value:** o conteúdo completo do arquivo JSON copiado e colado diretamente. 
+
+- Após essa configuração, o erro da DAG desapareceu. 
+
+- A DAG `geography_coordinates` aparece ativa no menu lateral esquerdo do Airflow, indicando conexão bem-sucedida com MinIO, PySpark e Delta Lake.
+
+Este procedimento validou a integração do Airflow com a infraestrutura de dados local, garantindo a execução confiável das pipelines.
+
+---
